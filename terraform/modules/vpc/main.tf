@@ -4,6 +4,8 @@ resource "aws_vpc" "vpc" {
   enable_dns_support   = true
   enable_dns_hostnames = true
 
+#  assign_generated_ipv6_cidr_block = true
+
   tags = merge(
     var.global_tags,
     {
@@ -30,6 +32,9 @@ resource "aws_subnet" "public_subnet" {
   availability_zone       = "${element(var.availability_zones, count.index)}"
   map_public_ip_on_launch = true
 
+#  assign_ipv6_address_on_creation = true
+#  ipv6_cidr_block = "${cidrsubnet(aws_vpc.eu-central-1.ipv6_cidr_block, 8, 1)}"
+
   tags = merge(
     var.global_tags,
     {
@@ -45,6 +50,11 @@ resource "aws_route_table" "public_rtb" {
     cidr_block = "0.0.0.0/0"
     gateway_id = aws_internet_gateway.igw.id
   }
+
+#  route {
+#    ipv6_cidr_block = "::/0"
+#    gateway_id = aws_internet_gateway.igw.id
+#  }
 
   tags = merge(
     var.global_tags,
