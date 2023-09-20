@@ -20,6 +20,9 @@
   notify:
     - Restart sshd
 
+- name: flush handlers
+  meta: flush_handlers
+
 - name: Copy logrotate file into /etc/logrotate.d
   become: true
   copy:
@@ -51,7 +54,7 @@
     state: directory
 
 - name: Download zip file from S3
-  amazon.aws.aws_s3:
+  amazon.aws.s3_object:
     bucket: skillup-s3-bucket-hazel.yap-001
     mode: get
     object: frontend.zip
@@ -73,6 +76,9 @@
     backup: yes
   notify: 
     - Restart apache2
+
+- name: flush handlers
+  meta: flush_handlers
 
 - name: Delete tmp folder
   file:
