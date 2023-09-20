@@ -50,7 +50,7 @@
 
 - name: Create tmp folder
   file:
-    path: /tmp/files
+    path: /tmp/fefiles
     state: directory
 
 - name: Download zip file from S3
@@ -58,22 +58,20 @@
     bucket: skillup-s3-bucket-hazel.yap-001
     mode: get
     object: frontend.zip
-    dest: "/tmp/files/frontend.zip"
+    dest: "/tmp/fefiles/frontend.zip"
 
 - name: Extract zip file to /var/www/html/
   become: true
   unarchive:
-    src: "/tmp/files/frontend.zip"
+    src: "/tmp/fefiles/frontend.zip"
     dest: "/var/www/html"
 
 - name: Set private ip address in index.html
   become: true
-  lineinfile:
+  replace:
     path: /var/www/html/index.html
-    state: present
-    regexp: 'private_ip_address.*'
-    line: '{{ private_ip_address }}'
-    backup: yes
+    regexp: 'private_ip_address(.*)'
+    replace: '{{ private_ip_address }}'
   notify: 
     - Restart apache2
 
