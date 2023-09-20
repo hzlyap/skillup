@@ -1,0 +1,16 @@
+/var/log/apache2/* {
+  # Sets the logs to rotate every week
+  weekly
+
+  # Tells the system to remove old logs and only keep the three most recent rotated logs
+  rotate 3
+
+  # Rotated logs will be compressed and kept on disk if they are 10 MB or less.
+  size 10M
+
+  # compress and delaycompress: These two options are used together and indicate that 
+  # rotated logs should be compressed (gzip) except for the most recent one.
+  compress
+
+  delaycompress
+}

@@ -1,0 +1,12 @@
+---
+# handlers file for frontend/
+- name: Restart sshd
+  service:
+    name: sshd
+    state: restarted
+
+- name: Restart apache2
+  service:
+    name: apache2
+    enabled: yes
+    state: restarted

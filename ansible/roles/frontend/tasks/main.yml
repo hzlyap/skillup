@@ -1,0 +1,102 @@
+---
+- name: Run apt-get update
+  become: true
+  apt:
+    update_cache: yes
+
+- name: Run apt-get upgrade
+  become: true
+  apt:
+    upgrade: dist
+
+- name: Update sshd_config
+  lineinfile:
+    path: /etc/sshd/sshd_config
+    state: present
+    regexp: '^#?Port 22'
+    line: 'Port 6522'
+    backup: yes
+  notify:
+    - Restart sshd
+
+- name: Copy logrotate file into /etc/logrotate.d
+  copy:
+    src: "apache2"
+    dest: "/etc/logrotate.d/apache2"
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Install packages
+  apt:
+    name: "{{ item }}"
+    state: latest
+    update_cache: yes
+  with_items:
+    - wget
+    - unzip
+    - curl
+    - git
+    - jq
+    - apache2
+    - mysql-client
+    - php
+
+- name: Create tmp folder
+  file:
+    path: /tmp/files
+    state: directory
+
+- name: Download zip file from S3
+  amazon.aws.aws_s3:
+    bucket: skillup-s3-bucket-hazel.yap-001
+    mode: get
+    object: frontend.zip
+    dest: "/tmp/files/frontend.zip"
+
+- name: Extract zip file to /var/www/html/
+  unarchive:
+    src: "/tmp/files/frontend.zip"
+    dest: "/var/www/html"
+
+- name: Set private ip address in index.html
+  lineinfile:
+    state: present
+    regexp: 'private_ip_address'
+    line: '{{ private_ip_address }}'
+    backup: yes
+  notify: Restart apache2
+
+- name: Delete tmp folder
+  file:
+    path: /tmp/files
+    state: absent
+
+- name: Create group
+  group:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - apple
+    - banana
+    - carrot
+
+- name: Create users
+  user:
+    name: "{{ item }}"
+    group: "{{ item }}"
+  with_items:
+    - apple
+    - banna
+    - carrot
+
+- name: Delete user carrot
+  user:
+    name: carrot
+    state: absent
+    remove: yes
+
+- name: Set permission to 0600
+  file:
+    path: /var/log/syslog
+    mode: '0600'
