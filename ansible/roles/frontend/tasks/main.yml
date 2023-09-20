@@ -54,7 +54,7 @@
     state: directory
 
 - name: Download zip file from S3
-  amazon.aws.s3_object:
+  amazon.aws.aws_s3:
     bucket: skillup-s3-bucket-hazel.yap-001
     mode: get
     object: frontend.zip
@@ -71,7 +71,7 @@
   lineinfile:
     path: /var/www/html/index.html
     state: present
-    regexp: 'private_ip_address'
+    regexp: 'private_ip_address.*'
     line: '{{ private_ip_address }}'
     backup: yes
   notify: 
