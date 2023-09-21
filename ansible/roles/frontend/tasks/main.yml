@@ -80,7 +80,7 @@
 
 - name: Delete tmp folder
   file:
-    path: /tmp/files
+    path: /tmp/fefiles
     state: absent
 
 - name: Create group
