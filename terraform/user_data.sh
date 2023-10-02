@@ -24,5 +24,5 @@ ec2_role=$(aws ec2 describe-instances --region us-east-2 --instance-id $instance
 
 private_ip_address=$(aws ec2 describe-instances --region us-east-2 --instance-id $instance_id --output text --query 'Reservations[].Instances[].[PrivateIpAddress]')
 
-ansible-playbook ansible/frontend.yml --extra-vars "ansible_role=$ec2_role private_ip_address=$private_ip_address"
+ansible-playbook ansible/master.yml -i localhost --extra-vars "ansible_role=$ec2_role private_ip_address=$private_ip_address"
 # END ANSIBLE

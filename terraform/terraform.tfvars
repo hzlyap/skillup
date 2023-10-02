@@ -21,6 +21,7 @@ asg_max_size         = 2
 asg_desired_capacity = 1
 
 global_tags = {
-  GBL_CLASS_0 = "SERVICE"
-  GBL_CLASS_1 = "TEST"
+  GBL_CLASS_0  = "SERVICE"
+  GBL_CLASS_1  = "TEST"
+  ansible_role = "frontend"
 }
