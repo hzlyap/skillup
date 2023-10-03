@@ -1,0 +1,117 @@
+---
+- name: Run apt-get update
+  become: true
+  apt:
+    update_cache: yes
+
+- name: Run apt-get upgrade
+  become: true
+  apt:
+    upgrade: dist
+
+- name: Update sshd_config
+  become: true
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    state: present
+    regexp: '^#?Port 22'
+    line: 'Port 6522'
+    backup: yes
+  notify:
+    - Restart sshd
+
+- name: flush handlers
+  meta: flush_handlers
+
+- name: Copy logrotate file into /etc/logrotate.d
+  become: true
+  copy:
+    src: "apache2"
+    dest: "/etc/logrotate.d/apache2"
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Install packages
+  become: true
+  apt:
+    name: "{{ item }}"
+    state: latest
+    update_cache: yes
+  with_items:
+    - wget
+    - unzip
+    - curl
+    - git
+    - jq
+    - apache2
+    - mysql-client
+    - php
+
+- name: Create tmp folder
+  file:
+    path: /tmp/fefiles
+    state: directory
+
+- name: Download zip file from S3
+  amazon.aws.aws_s3:
+    bucket: skillup-s3-bucket-hazel.yap-001
+    mode: get
+    object: frontend.zip
+    dest: "/tmp/fefiles/frontend.zip"
+
+- name: Extract zip file to /var/www/html/
+  become: true
+  unarchive:
+    src: "/tmp/fefiles/frontend.zip"
+    dest: "/var/www/html"
+
+- name: Set private ip address in index.html
+  become: true
+  replace:
+    path: /var/www/html/index.html
+    regexp: 'private_ip_address(.*)'
+    replace: '{{ private_ip_address }}'
+  notify: 
+    - Restart apache2
+
+- name: flush handlers
+  meta: flush_handlers
+
+- name: Delete tmp folder
+  file:
+    path: /tmp/fefiles
+    state: absent
+
+- name: Create group
+  become: true
+  group:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - apple
+    - banana
+    - carrot
+
+- name: Create users
+  become: true
+  user:
+    name: "{{ item }}"
+    group: "{{ item }}"
+  with_items:
+    - apple
+    - banana
+    - carrot
+
+- name: Delete user carrot
+  become: true
+  user:
+    name: carrot
+    state: absent
+    remove: yes
+
+- name: Set permission to 0600
+  become: true
+  file:
+    path: /var/log/syslog
+    mode: '0600'

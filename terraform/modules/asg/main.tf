@@ -99,4 +99,10 @@ resource "aws_autoscaling_group" "asg" {
     value = "COT"
     propagate_at_launch = true
   }
+
+  tag {
+    key = "ansible_role"
+    value = "frontend"
+    propagate_at_launch = true
+  }
 }
